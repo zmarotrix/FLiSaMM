@@ -1,4 +1,4 @@
-# Fantasy Life i Save and Mod Manager
+# FLiSaMM - Fantasy Life i Save and Mod Manager
 
 
 
