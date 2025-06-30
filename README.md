@@ -1,4 +1,4 @@
-# Fantasy Life i Mod Manager & Save Editor
+# Fantasy Life i Mod Save and Mod Manager
 
 
 
