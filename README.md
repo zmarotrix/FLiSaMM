@@ -1,8 +1,8 @@
 # FLiSaMM - Fantasy Life i Save and Mod Manager
 
+![image](https://github.com/user-attachments/assets/e3538e2a-750b-4836-b8eb-038043d23fb5) ![image](https://github.com/user-attachments/assets/9343d33b-0e22-49a7-ac33-5cc9c69a7ad4)
 
 
-![Fantasy Life i Logo](resources/logo.png)
 
 ## A comprehensive tool for managing mods and save files for Fantasy Life i.
 
