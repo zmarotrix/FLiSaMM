@@ -1,8 +1,10 @@
 # Fantasy Life i Mod Manager & Save Editor
 
-## A comprehensive tool for managing mods and save files for Fantasy Life i.
+
 
 ![Fantasy Life i Logo](resources/logo.png)
+
+## A comprehensive tool for managing mods and save files for Fantasy Life i.
 
 This application provides a user-friendly interface to streamline your modding and save management experience for Fantasy Life i: The Girl Who Steals Time on PC.
 
