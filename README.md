@@ -55,14 +55,9 @@ This application provides a user-friendly interface to streamline your modding a
     ```
 
 3.  **Activate the Virtual Environment:**
-    *   **Windows:**
-        ```bash
-        .\venv\Scripts\activate
-        ```
-    *   **macOS/Linux:**
-        ```bash
-        source venv/bin/activate
-        ```
+    ```bash
+    .\venv\Scripts\activate
+    ```
 
 4.  **Install Dependencies:**
     ```bash
