@@ -1,8 +1,10 @@
-# Fantasy Life i Mod Manager & Save Editor
+# FLiSaMM - Fantasy Life i Save and Mod Manager
 
-## A comprehensive tool for managing mods and save files for Fantasy Life i.
+
 
 ![Fantasy Life i Logo](resources/logo.png)
+
+## A comprehensive tool for managing mods and save files for Fantasy Life i.
 
 This application provides a user-friendly interface to streamline your modding and save management experience for Fantasy Life i: The Girl Who Steals Time on PC.
 
@@ -53,14 +55,9 @@ This application provides a user-friendly interface to streamline your modding a
     ```
 
 3.  **Activate the Virtual Environment:**
-    *   **Windows:**
-        ```bash
-        .\venv\Scripts\activate
-        ```
-    *   **macOS/Linux:**
-        ```bash
-        source venv/bin/activate
-        ```
+    ```bash
+    .\venv\Scripts\activate
+    ```
 
 4.  **Install Dependencies:**
     ```bash
