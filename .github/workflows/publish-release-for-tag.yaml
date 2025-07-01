@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   publish_release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
     - name: Install uv
@@ -24,7 +24,6 @@ jobs:
       run: |
         source .venv/bin/activate
         pyinstaller main.spec
-        ls dist/*
         mv dist/main.exe FLiSaMM-${{ github.ref_name }}.exe
         sha256sum FLiSaMM-${{ github.ref_name }}.exe > SHA256SUMS
     - name: Publish Release
