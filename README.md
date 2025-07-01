@@ -64,7 +64,8 @@ Download the latest version from the [releases page](https://github.com/danudey/
     ```
 
 3.  **Activate the Virtual Environment:**
-    Windows:
+
+    Windows Powershell:
     ```pwsh
     .\venv\Scripts\activate
     ```
@@ -74,10 +75,17 @@ Download the latest version from the [releases page](https://github.com/danudey/
     source .venv/bin/activate
     ```
 
-5.  **Run the Application:**
+4.  **Run the Application:**
     ```bash
     python main.py
     ```
+
+5. **Build and pack the executable:**
+   ```bash
+   pyinstaller main.spec
+   ```
+
+   The program will be built as `dist\main.exe` on Windows or `dist/main` on MacOS or Linux.
 
 ## Usage Guide
 
