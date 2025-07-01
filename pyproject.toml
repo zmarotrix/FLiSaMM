@@ -1,0 +1,12 @@
+[project]
+name = "flisamm"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "customtkinter>=5.2.2",
+    "pillow>=11.3.0",
+    "psutil>=7.0.0",
+    "ruff>=0.12.1",
+]
