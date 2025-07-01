@@ -24,6 +24,7 @@ jobs:
       run: |
         source .venv/bin/activate
         pyinstaller main.spec
+        ls dist/*
         mv dist/main.exe FLiSaMM-${{ github.ref_name }}.exe
         sha256sum FLiSaMM-${{ github.ref_name }}.exe > SHA256SUMS
     - name: Publish Release
