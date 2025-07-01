@@ -1,0 +1,34 @@
+# This workflow triggers when a tag is published, and creates a new release
+# for that tag including building and publishing a Windows executable.
+
+name: Publish Executable for Tags
+
+on:
+  push:
+    tags: [ "v*" ]
+
+permissions:
+  contents: write
+
+jobs:
+  publish_release:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+    - name: Install dependencies
+      run: |
+        uv sync
+    - name: Build executable
+      run: |
+        .venv\Scripts\activate
+        pyinstaller main.spec
+        mv dist\main.exe FLiSaMM-${{ github.ref_name }}.exe
+    - name: Publish Release
+      id: create_release
+      uses: softprops/action-gh-release@v2
+      with:
+        fail_on_unmatched_files: true
+        files: |
+          FLiSaMM-${{ github.ref_name }}.exe

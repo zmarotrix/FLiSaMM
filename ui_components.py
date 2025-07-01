@@ -9,6 +9,7 @@ import customtkinter as ctk
 
 class CustomMessageBox(ctk.CTkToplevel):
     """A custom, theme-aware messagebox that matches the application's style."""
+
     def __init__(self, parent, title="Message", message="", buttons=("OK",)):
         super().__init__(parent)
         self.transient(parent)
@@ -22,21 +23,25 @@ class CustomMessageBox(ctk.CTkToplevel):
         self.grid_rowconfigure(0, weight=1)
 
         ctk.CTkLabel(self, text=message, wraplength=380, justify="left").grid(
-            row=0, column=0, padx=20, pady=20)
+            row=0, column=0, padx=20, pady=20
+        )
 
         button_frame = ctk.CTkFrame(self, fg_color="transparent")
         button_frame.grid(row=1, column=0, padx=20, pady=(0, 20), sticky="e")
 
         for i, button_text in enumerate(reversed(buttons)):
             btn = ctk.CTkButton(
-                button_frame, text=button_text,
+                button_frame,
+                text=button_text,
                 command=lambda val=button_text: self._button_pressed(val),
-                width=100
+                width=100,
             )
             btn.pack(side="right", padx=5)
             if i == 0:
                 btn.focus_set()
-                self.bind("<Return>", lambda e, val=button_text: self._button_pressed(val))
+                self.bind(
+                    "<Return>", lambda e, val=button_text: self._button_pressed(val)
+                )
 
         self.bind("<Escape>", self._cancel_pressed)
         self.update_idletasks()
@@ -44,7 +49,9 @@ class CustomMessageBox(ctk.CTkToplevel):
         parent_x, parent_y = parent.winfo_x(), parent.winfo_y()
         parent_w, parent_h = parent.winfo_width(), parent.winfo_height()
         self_w, self_h = self.winfo_width(), self.winfo_height()
-        self.geometry(f"+{parent_x + (parent_w - self_w) // 2}+{parent_y + (parent_h - self_h) // 2}")
+        self.geometry(
+            f"+{parent_x + (parent_w - self_w) // 2}+{parent_y + (parent_h - self_h) // 2}"
+        )
 
     def _button_pressed(self, value):
         self._result = value
@@ -61,8 +68,10 @@ class CustomMessageBox(ctk.CTkToplevel):
 
 class CustomInputDialog(ctk.CTkToplevel):
     """A custom dialog window for user text input."""
-    def __init__(self, parent, title="Input", prompt="", initial_value="",
-                 random_name_func=None):
+
+    def __init__(
+        self, parent, title="Input", prompt="", initial_value="", random_name_func=None
+    ):
         super().__init__(parent)
         self.transient(parent)
         self.title(title)
@@ -74,11 +83,11 @@ class CustomInputDialog(ctk.CTkToplevel):
         self._random_name_func = random_name_func
 
         ctk.CTkLabel(self, text=prompt, wraplength=380).pack(
-            pady=(10, 5), padx=10, fill="x")
+            pady=(10, 5), padx=10, fill="x"
+        )
 
         self._entry_value = tkinter.StringVar(value=initial_value)
-        self._entry = ctk.CTkEntry(
-            self, textvariable=self._entry_value, width=380)
+        self._entry = ctk.CTkEntry(self, textvariable=self._entry_value, width=380)
         self._entry.pack(pady=5, padx=10)
         self._entry.focus_set()
 
@@ -87,15 +96,18 @@ class CustomInputDialog(ctk.CTkToplevel):
 
         if self._random_name_func:
             ctk.CTkButton(
-                button_frame, text="Generate Random", fg_color="gray",
-                command=self._generate_random).pack(side="left", padx=10)
+                button_frame,
+                text="Generate Random",
+                fg_color="gray",
+                command=self._generate_random,
+            ).pack(side="left", padx=10)
 
         ctk.CTkButton(
-            button_frame, text="OK", command=self._ok_pressed,
-            width=100).pack(side="left", padx=10)
+            button_frame, text="OK", command=self._ok_pressed, width=100
+        ).pack(side="left", padx=10)
         ctk.CTkButton(
-            button_frame, text="Cancel", command=self._cancel_pressed,
-            width=100).pack(side="left", padx=10)
+            button_frame, text="Cancel", command=self._cancel_pressed, width=100
+        ).pack(side="left", padx=10)
 
         self.bind("<Return>", self._ok_pressed)
         self.bind("<Escape>", self._cancel_pressed)
@@ -106,7 +118,9 @@ class CustomInputDialog(ctk.CTkToplevel):
         parent_x, parent_y = parent.winfo_x(), parent.winfo_y()
         parent_w, parent_h = parent.winfo_width(), parent.winfo_height()
         self_w, self_h = self.winfo_width(), self.winfo_height()
-        self.geometry(f"+{parent_x + (parent_w - self_w) // 2}+{parent_y + (parent_h - self_h) // 2}")
+        self.geometry(
+            f"+{parent_x + (parent_w - self_w) // 2}+{parent_y + (parent_h - self_h) // 2}"
+        )
 
     def _generate_random(self):
         if self._random_name_func:

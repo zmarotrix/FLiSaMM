@@ -32,11 +32,20 @@ This application provides a user-friendly interface to streamline your modding a
 
 ## Installation
 
+Download the latest version from the [releases page](https://github.com/danudey/FLiSaMM/releases).
+
+## Building from source
+
 ### Prerequisites
 
-*   **Python 3.8+:** Download from [python.org](https://www.python.org/downloads/).
-*   **`pip`:** Usually comes installed with Python.
-*   **`git` (Optional, but recommended for cloning):** Download from [git-scm.com](https://git-scm.com/downloads).
+#### Required
+
+*   **`uv`:** Download from the [Astral website](https://docs.astral.sh/uv/#installation).
+
+#### Optional
+
+*   **[`git`](https://git-scm.com/downloads):** For downloading the source code, making changes, and submitting them. [git-scm.com]().
+*   **[Python 3.12](https://www.python.org/downloads/):** If you do not have the correct version of Python installed, `uv` will automatically install it for you in step 2 below, so installing it beforehand is optional.
 
 ### Setup Steps
 
@@ -49,25 +58,34 @@ This application provides a user-friendly interface to streamline your modding a
     **Alternatively, download the ZIP:**
     Go to the GitHub repository page, click "Code" -> "Download ZIP", then extract the contents to your desired folder.
 
-2.  **Create a Virtual Environment (Recommended for dependency management):**
+2.  **Create the virtual environment and install dependencies:**
     ```bash
-    python -m venv venv
+    uv sync
     ```
 
 3.  **Activate the Virtual Environment:**
-    ```bash
+
+    Windows Powershell:
+    ```pwsh
     .\venv\Scripts\activate
     ```
 
-4.  **Install Dependencies:**
+    Linux/MacOS:
     ```bash
-    pip install -r requirements.txt
+    source .venv/bin/activate
     ```
 
-5.  **Run the Application:**
+4.  **Run the Application:**
     ```bash
     python main.py
     ```
+
+5. **Build and pack the executable:**
+   ```bash
+   pyinstaller main.spec
+   ```
+
+   The program will be built as `dist\main.exe` on Windows or `dist/main` on MacOS or Linux.
 
 ## Usage Guide
 
