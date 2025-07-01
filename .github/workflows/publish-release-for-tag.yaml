@@ -22,10 +22,9 @@ jobs:
         uv sync
     - name: Build executable
       run: |
-        source .venv/bin/activate
+        .venv\Scripts\activate
         pyinstaller main.spec
-        mv dist/main.exe FLiSaMM-${{ github.ref_name }}.exe
-        sha256sum FLiSaMM-${{ github.ref_name }}.exe > SHA256SUMS
+        mv dist\main.exe FLiSaMM-${{ github.ref_name }}.exe
     - name: Publish Release
       id: create_release
       uses: softprops/action-gh-release@v2
@@ -33,4 +32,3 @@ jobs:
         fail_on_unmatched_files: true
         files: |
           FLiSaMM-${{ github.ref_name }}.exe
-          SHA256SUMS
