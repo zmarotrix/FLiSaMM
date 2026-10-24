@@ -21,7 +21,7 @@ def app_data_dir():
     """Returns the per-user data folder, creating it if needed.
 
     The FLISAMM_DATA_DIR environment variable overrides the location, which is
-    useful for tests and portable setups.
+    useful for portable setups.
     """
     override = os.environ.get("FLISAMM_DATA_DIR")
     if override:

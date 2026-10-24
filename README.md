@@ -196,12 +196,11 @@ Set the `FLISAMM_DATA_DIR` environment variable to use a different folder (for e
 ## Development
 
 ```bash
-pip install -r requirements-dev.txt
-python -m pytest              # run the tests
+pip install -r requirements-build.txt
 pyinstaller FLiSaMM.spec      # build dist/FLiSaMM.exe
 ```
 
-The code lives in the `flisamm` package: `saves.py`, `mods.py`, `game.py` and `steam.py` hold all the logic (no UI code, fully covered by tests in `tests/`), and `flisamm/ui/` holds the CustomTkinter interface. Pushing a tag like `v1.0.0-e` builds the exe and publishes a GitHub release automatically.
+The code lives in the `flisamm` package: `saves.py`, `mods.py`, `game.py` and `steam.py` hold all the logic (no UI code), and `flisamm/ui/` holds the CustomTkinter interface. Pushing a tag like `v1.0.0-e` builds the exe and publishes a GitHub release automatically.
 
 ## Contributing
 
@@ -209,7 +208,7 @@ Contributions are welcome! If you have suggestions for improvements, bug fixes, 
 
 1.  Fork the repository.
 2.  Create a new branch (`git checkout -b feature/your-feature`).
-3.  Make your changes and run the tests.
+3.  Make your changes.
 4.  Write clear commit messages.
 5.  Push your branch (`git push origin feature/your-feature`).
 6.  Open a Pull Request.
