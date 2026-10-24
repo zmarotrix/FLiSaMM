@@ -17,8 +17,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - run: pip install -r requirements-dev.txt
-      - run: python -m pytest -q
+      - run: pip install -r requirements-build.txt
       - run: pyinstaller --noconfirm FLiSaMM.spec
       - run: Compress-Archive -Path dist/FLiSaMM.exe -DestinationPath FLiSaMM.zip
       - name: Publish release
