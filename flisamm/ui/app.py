@@ -95,7 +95,7 @@ class App(ctk.CTk):
             font=ctk.CTkFont(weight="bold"))
 
     def _create_tabs(self):
-        self.main_tabs = ctk.CTkTabview(self, anchor="w")
+        self.main_tabs = ctk.CTkTabview(self, anchor="w", command=self._on_main_tab_changed)
         self.main_tabs.grid(row=1, column=0, padx=10, pady=(0, 10), sticky="nsew")
         save_tab = self.main_tabs.add("Save Management")
         mod_tab = self.main_tabs.add("Mod Management")
@@ -107,6 +107,11 @@ class App(ctk.CTk):
         self.mods_tab = ModsTab(mod_tab, self, self.steam_icon)
         self.mods_tab.grid(row=0, column=0, sticky="nsew")
         self.mods_tab.refresh()
+
+    def _on_main_tab_changed(self):
+        # Pick up mods copied into the game folder while the app was open.
+        if self.main_tabs.get() == "Mod Management":
+            self.mods_tab.rescan()
 
     # --- Game path ---
 

@@ -108,6 +108,16 @@ class ModsTab(ctk.CTkFrame):
         self.mod_list.grid(row=2, column=0, sticky="nsew", padx=10)
         self.mod_list.grid_columnconfigure(0, weight=1)
         self.empty_label = ctk.CTkLabel(self.mod_list, text="No mods installed.", text_color="gray60")
+        self.detected = []
+        self.detected_frame = ctk.CTkFrame(self.mod_list, fg_color="#22384A", border_width=1,
+                                           border_color="#1F6AA5")
+        self.detected_frame.grid_columnconfigure(0, weight=1)
+        self.detected_label = ctk.CTkLabel(self.detected_frame, text="", justify="left", anchor="w",
+                                           wraplength=TEXT_WRAP - 140)
+        self.detected_label.grid(row=0, column=0, sticky="ew", padx=12, pady=8)
+        self.import_button = ctk.CTkButton(self.detected_frame, text="Import", width=90,
+                                           command=self.import_detected)
+        self.import_button.grid(row=0, column=1, padx=12, pady=8)
 
         list_actions = ctk.CTkFrame(self, fg_color="transparent")
         list_actions.grid(row=3, column=0, sticky="ew", padx=10, pady=(5, 0))
@@ -147,6 +157,15 @@ class ModsTab(ctk.CTkFrame):
         game = self.app.game
         self.game_path_label.configure(text=f"Game Path: {game.path if game else 'Not Set'}")
         self._refresh_eac()
+        self.rescan()
+
+    def rescan(self):
+        """Looks for mods in the game folder that FLiSaMM isn't managing yet."""
+        try:
+            self.detected = self.mods.detect_unmanaged() if self.mods else []
+        except OSError:
+            log.exception("Could not scan the mods folder")
+            self.detected = []
         self._refresh_mods()
         self._update_buttons()
 
@@ -172,6 +191,16 @@ class ModsTab(ctk.CTkFrame):
                 self._rows.pop(mod_id).destroy()
         for row in self._rows.values():
             row.pack_forget()
+        self.detected_frame.pack_forget()
+        if self.detected:
+            names = ", ".join(d.name for d in self.detected[:5])
+            more = f" and {len(self.detected) - 5} more" if len(self.detected) > 5 else ""
+            count = len(self.detected)
+            self.detected_label.configure(
+                text=f"Found {count} mod{'s' if count != 1 else ''} in the game folder that FLiSaMM "
+                     f"isn't managing yet: {names}{more}.\nImport them to switch them on and off, "
+                     "change their load order and delete them from here.")
+            self.detected_frame.pack(fill="x", padx=5, pady=(2, 6))
         for i, mod in enumerate(mods):
             row = self._rows.get(mod.id)
             if row is None:
@@ -179,7 +208,7 @@ class ModsTab(ctk.CTkFrame):
             overrides, overridden_by = conflicts.get(mod.id, (set(), set()))
             row.update_row(mod, i, len(mods), overrides, overridden_by, self.locked)
             row.pack(fill="x", padx=5, pady=2)
-        if mods:
+        if mods or self.detected:
             self.empty_label.pack_forget()
         else:
             self.empty_label.pack(pady=20)
@@ -190,6 +219,7 @@ class ModsTab(ctk.CTkFrame):
         self.install_button.configure(state=state)
         self.reapply_button.configure(state=state)
         self.disable_all_button.configure(state=state if self.mods and self.mods.mods else "disabled")
+        self.import_button.configure(state=state)
         self.eac_switch.configure(state="normal" if self.app.game and not self.locked else "disabled")
 
     # --- Mod actions ---
@@ -203,8 +233,14 @@ class ModsTab(ctk.CTkFrame):
             show_message(self.app, "Mod Error", str(e))
             return None
         finally:
-            self._refresh_mods()
-            self._update_buttons()
+            self.rescan()
+
+    def import_detected(self):
+        if not self.mods or not self.app.ensure_game_closed("import mods"):
+            return
+        self.rescan()
+        if self.detected:
+            self._run("Importing mods...", self.mods.adopt, self.detected)
 
     def install_mods(self):
         if not self.mods or not self.app.ensure_game_closed("install mods"):

@@ -37,6 +37,7 @@ DOC_EXTENSIONS = {
 ARCHIVE_EXTENSIONS = {".zip", ".7z"}
 INSTALLABLE_EXTENSIONS = ARCHIVE_EXTENSIONS | PAK_EXTENSIONS
 LEGACY_DIR_NAME = "_manager_data"
+DISABLED_SUFFIX = ".disabled"
 
 
 class ModError(Exception):
@@ -70,6 +71,14 @@ class PendingInstall:
 
     def cleanup(self):
         shutil.rmtree(self.work_dir, ignore_errors=True)
+
+
+@dataclass
+class DetectedMod:
+    """A mod found in the game folder that FLiSaMM isn't managing."""
+    name: str
+    files: list           # game-relative paths as found (may end in .disabled)
+    enabled: bool
 
 
 def plan_layout(rel_paths, game_path):
@@ -252,6 +261,68 @@ class ModManager:
                 result[mod.id][0].update(m.name for m in mods[:i])
                 result[mod.id][1].update(m.name for m in mods[i + 1:])
         return result
+
+    # --- Mods installed outside FLiSaMM ---
+
+    def detect_unmanaged(self):
+        """Finds pak mods in ~mods that were installed by hand or by another tool.
+
+        Files in a subfolder of ~mods form one mod; loose files are grouped by
+        name, so a .pak with its .utoc/.ucas counts as one mod. Files renamed
+        to *.disabled (how FLiSaMM 0.9 disabled mods) are found too.
+        """
+        mods_dir = self.game_path / MODS_DIR_REL
+        if not mods_dir.is_dir():
+            return []
+        groups = {}
+        for path in sorted(mods_dir.rglob("*")):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(self.game_path).as_posix()
+            disabled = rel.lower().endswith(DISABLED_SUFFIX)
+            real_rel = rel[:-len(DISABLED_SUFFIX)] if disabled else rel
+            stem, ext = os.path.splitext(real_rel.rsplit("/", 1)[-1])
+            if ext.lower() not in PAK_EXTENSIONS or _key(real_rel) in self.deployed:
+                continue
+            subfolder = path.parent.relative_to(mods_dir).parts
+            name = subfolder[0] if subfolder else stem
+            group = groups.setdefault(name.lower(), DetectedMod(name, [], False))
+            group.files.append(rel)
+            group.enabled = group.enabled or not disabled
+        return list(groups.values())
+
+    def adopt(self, detected):
+        """Takes over detected mods so they can be toggled, ordered and deleted."""
+        adopted = []
+        for found in detected:
+            name, n = found.name, 2
+            while self.find_by_name(name):
+                name, n = f"{found.name} ({n})", n + 1
+            mod = Mod(id=os.urandom(8).hex(), name=name, files=[], enabled=found.enabled,
+                      source="Found in the game folder")
+            moved = []
+            try:
+                for rel in found.files:
+                    target = rel[:-len(DISABLED_SUFFIX)] if rel.lower().endswith(DISABLED_SUFFIX) else rel
+                    if any(_key(f) == _key(target) for f in mod.files):
+                        continue
+                    move(self.game_path / rel, self.staging_path / mod.id / target)
+                    moved.append((rel, target))
+                    mod.files.append(target)
+            except OSError as e:
+                for rel, target in moved:
+                    move(self.staging_path / mod.id / target, self.game_path / rel)
+                shutil.rmtree(self.staging_path / mod.id, ignore_errors=True)
+                self._save()
+                if adopted:
+                    self.sync()
+                raise ModError(f"Could not import '{found.name}' (is the game running?): {e}") from e
+            if mod.files:
+                self.mods.append(mod)
+                adopted.append(mod)
+        self._save()
+        self.sync()
+        return adopted
 
     # --- Installing ---
 

@@ -29,6 +29,7 @@ This application provides a user-friendly interface to streamline your modding a
     *   Game files replaced by a mod are backed up and restored when the mod is disabled or deleted.
     *   Load order with conflict detection: when two mods change the same file, the one lower in the list wins.
     *   Re-install a mod with the same name to update it in place.
+    *   Detects mods you installed by hand (or with another tool) in `~mods` and offers to import them.
 *   **Game Utilities:**
     *   **Easy Anti-Cheat (EAC) Bypass:** Toggle EAC on/off for mod compatibility. Detects when a game update or Steam's "Verify integrity of game files" has undone it.
     *   **Flexible Game Launch:** Launch the game via Steam or directly using the game's executable.
@@ -123,6 +124,10 @@ The "Mod Management" tab is where you control your game modifications.
 3.  The app works out where the files belong. If something looks wrong (for example, the mod would create new folders in the game directory), it warns you and asks before installing.
 
 Readme files and images inside an archive are not copied into the game.
+
+#### Mods Installed Outside FLiSaMM
+
+If you copied mods into `Game/Content/Paks/~mods` yourself, FLiSaMM lists them at the top of the mod list and offers to **Import** them. Each subfolder of `~mods` counts as one mod, and loose files are grouped by name (a `.pak` with its `.utoc`/`.ucas`). Files ending in `.disabled` (how 0.9 turned mods off) are imported as disabled mods. Nothing is moved until you click Import; after that, the mods can be toggled, reordered and deleted like any other.
 
 #### Enabling/Disabling Mods and Load Order
 

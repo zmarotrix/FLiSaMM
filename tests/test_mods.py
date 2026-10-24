@@ -176,3 +176,67 @@ def test_migrates_legacy_mods(game, store):
     assert not (game / MODS / "off.pak.disabled").exists()
     manager.set_enabled(manager.find_by_name("Off").id, True)
     assert (game / MODS / "off.pak").read_bytes() == b"off"
+
+
+def test_detects_mods_installed_by_hand(game, store, tmp_path):
+    manager = ModManager(game, store)
+    managed = install(manager, make_zip(tmp_path / "Managed.zip", {"managed.pak": b"m"}))
+    mods_dir = game / MODS
+    for ext in (".pak", ".utoc", ".ucas"):
+        (mods_dir / f"Hand_P{ext}").write_bytes(b"hand")
+    (mods_dir / "Bundle").mkdir()
+    (mods_dir / "Bundle" / "one.pak").write_bytes(b"1")
+    (mods_dir / "Bundle" / "two.pak").write_bytes(b"2")
+    (mods_dir / "Old_P.pak.disabled").write_bytes(b"old")
+    (mods_dir / "notes.txt").write_text("not a mod")
+
+    found = {d.name: d for d in manager.detect_unmanaged()}
+    assert sorted(found) == ["Bundle", "Hand_P", "Old_P"]
+    assert len(found["Hand_P"].files) == 3
+    assert len(found["Bundle"].files) == 2
+    assert found["Old_P"].enabled is False
+    assert managed.name not in found
+
+
+def test_adopting_detected_mods(game, store, tmp_path):
+    manager = ModManager(game, store)
+    install(manager, make_zip(tmp_path / "Hand_P.zip", {"other.pak": b"x"}))   # Name clash.
+    mods_dir = game / MODS
+    (mods_dir / "Hand_P.pak").write_bytes(b"hand")
+    (mods_dir / "Old_P.pak.disabled").write_bytes(b"old")
+
+    adopted = manager.adopt(manager.detect_unmanaged())
+    assert sorted(m.name for m in adopted) == ["Hand_P (2)", "Old_P"]
+    assert manager.detect_unmanaged() == []
+    # Enabled mods stay in place (now linked); disabled ones leave the game folder.
+    assert (mods_dir / "Hand_P.pak").read_bytes() == b"hand"
+    assert not (mods_dir / "Old_P.pak.disabled").exists()
+    assert not (mods_dir / "Old_P.pak").exists()
+
+    old = manager.find_by_name("Old_P")
+    manager.set_enabled(old.id, True)
+    assert (mods_dir / "Old_P.pak").read_bytes() == b"old"
+    manager.delete(manager.find_by_name("Hand_P (2)").id)
+    assert not (mods_dir / "Hand_P.pak").exists()
+
+
+def test_failed_adopt_leaves_files_in_place(game, store, monkeypatch):
+    import flisamm.mods as mods_module
+    manager = ModManager(game, store)
+    mods_dir = game / MODS
+    mods_dir.mkdir(parents=True)
+    (mods_dir / "Locked_P.pak").write_bytes(b"pak")
+    (mods_dir / "Locked_P.utoc").write_bytes(b"utoc")
+    real_move = mods_module.move
+
+    def flaky_move(src, dst):
+        if str(src).endswith(".utoc"):
+            raise PermissionError("in use")
+        return real_move(src, dst)
+
+    monkeypatch.setattr(mods_module, "move", flaky_move)
+    with pytest.raises(ModError):
+        manager.adopt(manager.detect_unmanaged())
+    monkeypatch.setattr(mods_module, "move", real_move)
+    assert sorted(p.name for p in mods_dir.iterdir()) == ["Locked_P.pak", "Locked_P.utoc"]
+    assert manager.mods == []
