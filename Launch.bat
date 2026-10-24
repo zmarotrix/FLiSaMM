@@ -1,72 +1,42 @@
 @echo off
 setlocal
+cd /d "%~dp0"
 
-REM --- Configuration ---
+REM Runs FLiSaMM from source. Most users should download FLiSaMM.exe from the
+REM Releases page instead.
+
 set VENV_DIR=venv
 set PYTHON_EXE=%VENV_DIR%\Scripts\python.exe
-set REQUIREMENTS_FILE=requirements.txt
-set MAIN_APP_FILE=main.py
+set STAMP=%VENV_DIR%\requirements.installed
 
-echo Launching Fantasy Life i Mod Manager...
-echo.
-
-REM --- Check and Create Virtual Environment ---
-if not exist "%VENV_DIR%\" (
+if not exist "%PYTHON_EXE%" (
     echo Creating virtual environment. This may take a moment...
-    python -m venv "%VENV_DIR%"
-    if %ERRORLEVEL% NEQ 0 (
+    python -c "import sys; sys.exit(sys.version_info < (3, 11))" 2>nul
+    if errorlevel 1 (
         echo.
-        echo ERROR: Failed to create virtual environment.
-        echo Please ensure Python 3.8+ is installed and accessible via your PATH.
-        echo.
+        echo ERROR: Python 3.11 or newer is required and must be on your PATH.
+        echo Download it from https://www.python.org/downloads/
         pause
-        exit /b %ERRORLEVEL%
+        exit /b 1
     )
-) else (
-    echo Virtual environment already exists.
+    python -m venv "%VENV_DIR%" || goto :fail
 )
 
-REM --- Activate Virtual Environment ---
-echo Activating virtual environment...
-call "%VENV_DIR%\Scripts\activate"
-if %ERRORLEVEL% NEQ 0 (
-    echo.
-    echo ERROR: Failed to activate virtual environment.
-    echo Please check the '%VENV_DIR%\' folder for issues.
-    echo.
-    pause
-    exit /b %ERRORLEVEL%
+REM Only reinstall dependencies when requirements.txt has changed.
+fc /b requirements.txt "%STAMP%" >nul 2>&1
+if errorlevel 1 (
+    echo Installing dependencies...
+    "%PYTHON_EXE%" -m pip install --disable-pip-version-check -q -r requirements.txt || goto :fail
+    copy /y requirements.txt "%STAMP%" >nul
 )
 
-REM --- Install/Update Dependencies ---
-REM pip is smart enough to only install/update what's needed.
-REM This ensures all requirements are met without full re-installation.
-echo Installing/Updating dependencies. This might take a moment if new dependencies are found...
-pip install -r "%REQUIREMENTS_FILE%"
-if %ERRORLEVEL% NEQ 0 (
-    echo.
-    echo ERROR: Failed to install dependencies.
-    echo Please check '%REQUIREMENTS_FILE%' and your internet connection.
-    echo.
-    pause
-    exit /b %ERRORLEVEL%
-)
+"%PYTHON_EXE%" main.py
+if errorlevel 1 goto :fail
+exit /b 0
 
-REM --- Launch the Application ---
+:fail
 echo.
-echo Launching %MAIN_APP_FILE%...
-"%PYTHON_EXE%" "%MAIN_APP_FILE%"
-if %ERRORLEVEL% NEQ 0 (
-    echo.
-    echo ERROR: The application encountered an error and exited.
-    echo Please check the console output above for details.
-    echo.
-    pause
-    exit /b %ERRORLEVEL%
-)
-
-echo.
-echo Application finished.
+echo ERROR: Something went wrong. See the messages above, or the log in
+echo %LOCALAPPDATA%\FLiSaMM\logs\flisamm.log
 pause
-
-endlocal
+exit /b 1

@@ -3,10 +3,21 @@ Stores static resources and configuration constants for the application.
 """
 
 # --- Application Configuration ---
-CONFIG_FILE = "config.json"
 APP_NAME = "Fantasy Life i - Save & Mod Manager"
-APP_VERSION = "0.9b"
-APP_DIMENSIONS = "1000x850"
+APP_VERSION = "1.0.0"
+APP_DATA_DIR_NAME = "FLiSaMM"
+WINDOW_SIZE = (1000, 850)
+WINDOW_MIN_SIZE = (900, 600)
+
+# --- Game Constants ---
+STEAM_APP_ID = "2993780"
+GAME_FOLDER_NAME = "FANTASY LIFE i"
+EAC_LAUNCHER_EXE = "EACLauncher.exe"
+GAME_EXE = "NFL1.exe"
+SHIPPING_EXE_REL = "Game/Binaries/Win64/NFL1-Win64-Shipping.exe"
+GAME_PROCESS_NAMES = ("NFL1-Win64-Shipping.exe",)
+MODS_DIR_REL = "Game/Content/Paks/~mods"
+TENOKE_SAVE_REL = "Game/Binaries/Win64/SteamData"
 
 # --- Word Lists for Random Name Generation ---
 FL_ADJECTIVES = [
