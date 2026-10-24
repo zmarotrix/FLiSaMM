@@ -196,7 +196,7 @@ python -m pytest              # run the tests
 pyinstaller FLiSaMM.spec      # build dist/FLiSaMM.exe
 ```
 
-The code lives in the `flisamm` package: `saves.py`, `mods.py`, `game.py` and `steam.py` hold all the logic (no UI code, fully covered by tests in `tests/`), and `flisamm/ui/` holds the CustomTkinter interface. Pushing a tag like `v1.0.0` builds the exe and publishes a GitHub release automatically.
+The code lives in the `flisamm` package: `saves.py`, `mods.py`, `game.py` and `steam.py` hold all the logic (no UI code, fully covered by tests in `tests/`), and `flisamm/ui/` holds the CustomTkinter interface. Pushing a tag like `v1.0.0-e` builds the exe and publishes a GitHub release automatically.
 
 ## Contributing
 

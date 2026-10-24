@@ -1,6 +1,7 @@
 name: Release
 
-# Push a tag like v1.0.0 to build FLiSaMM.exe and publish it as a GitHub release.
+# Push a tag like v1.0.0-e to build FLiSaMM.zip (containing FLiSaMM.exe) and
+# attach it to the GitHub release for that tag, creating the release if needed.
 on:
   push:
     tags: ["v*"]
@@ -19,8 +20,15 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: python -m pytest -q
       - run: pyinstaller --noconfirm FLiSaMM.spec
+      - run: Compress-Archive -Path dist/FLiSaMM.exe -DestinationPath FLiSaMM.zip
       - name: Publish release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/FLiSaMM.exe --title "FLiSaMM $GITHUB_REF_NAME" --generate-notes
+        run: |
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" FLiSaMM.zip --clobber
+          else
+            version="${GITHUB_REF_NAME%-e}"
+            gh release create "$GITHUB_REF_NAME" FLiSaMM.zip --title "FLiSaMM-$version-exe" --generate-notes
+          fi
